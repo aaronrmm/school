@@ -5,13 +5,13 @@ public class Test {
 		TMS tms = new TMS();
 		
 		
-		tms.addSentence("-C*A+B->Q");
+		tms.add_sentence("-C*A+B->Q");
 		System.out.println(tms.getState());
 
-		tms.addSentence("A");
-		tms.addSentence("B");
-		tms.addSentence("-C");
-		tms.addSentence("D");
+		tms.add_sentence("A");
+		tms.add_sentence("B");
+		tms.add_sentence("-C");
+		tms.add_sentence("D");
 		
 		System.out.println(tms.getState());
 

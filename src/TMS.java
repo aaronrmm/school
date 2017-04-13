@@ -128,11 +128,12 @@ public class TMS {
 		return sb.toString();
 	}
 
-	public void addSentence(String string) {
+	public void add_sentence(String string) {
 		String[] split = string.split("->");
 		if (split.length==1){//variable
 			Variable variable = getVariable(split[0]);
 			in_effect(variable);
+			retract_conflicts(variable);
 			for(Implication implication: implications.values())
 				if(implication.in_effect)
 					tryImplication(implication);
@@ -173,5 +174,18 @@ public class TMS {
 			DebugPrint.print_debug("new addition:" +sentence);
 		}
 		sentence.in_effect = true;
+	}
+	
+	void retract_conflicts(Variable variable){
+		String negative = "";
+		if(variable.name.startsWith("-")){
+			negative = variable.name.substring(1);
+		}
+		else{
+			negative = "-"+variable.name;
+		}
+		if(variables.containsKey(negative))
+		retractVariable(variables.get(negative));
+		
 	}
 }
