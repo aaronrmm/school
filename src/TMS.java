@@ -42,7 +42,7 @@ public class TMS {
 				for(Object o : bag){
 					j.required_variables.add((Variable)o);
 				}
-				implication.result.justifications.add(j);
+				implication.result.addJustification(j);
 			}
 		}
 	}
@@ -51,47 +51,13 @@ public class TMS {
 	public void retract_sentence(String string){
 		Variable variable = variables.get(string);
 		if(variable!=null){
-			variable.in_effect = false;
-			for(Variable sentence: variables.values()){
-				ArrayList<Justification> toRemove = new ArrayList<Justification>();
-				for(Justification justification: sentence.justifications){
-					if(justification.required_variables.contains(variable))
-						toRemove.add(justification);
-				}
-				for(Justification justification: toRemove){
-					sentence.justifications.remove(justification);
-				}
-				if(sentence.justifications.size()==0)
-					sentence.in_effect = false;
-			}
-			for(Implication sentence: implications.values()){
-				ArrayList<Justification> toRemove = new ArrayList<Justification>();
-				for(Justification justification: sentence.justifications){
-					if(justification.required_variables.contains(variable))
-						toRemove.add(justification);
-				}
-				for(Justification justification: toRemove){
-					sentence.justifications.remove(justification);
-				}
-				if(sentence.justifications.size()==0)
-					sentence.in_effect = false;
-			}
+			retractVariable(variable);
 			return;
 		}
 		else{
 			Implication implication = implications.get(string);
 			if(implication!=null){
-				implication.in_effect = false;
-				ArrayList<Justification> toRemove = new ArrayList<Justification>();
-				for(Justification justification: implication.result.justifications){
-					if (justification.implication == implication)
-						toRemove.add(justification);
-				}
-				for(Justification justification: toRemove){
-					implication.result.justifications.remove(justification);
-				}
-				if(implication.result.justifications.size()==0)
-					implication.result.in_effect = false;
+				retractImplication(implication);
 				return;
 			}
 			
@@ -99,6 +65,52 @@ public class TMS {
 		System.out.println("Sentence does not exist in knowledge base.");
 	}
 	
+	public void retractImplication(Implication implication){
+		System.out.println("Retracting "+implication);
+		implication.in_effect = false;
+		ArrayList<Justification> toRemove = new ArrayList<Justification>();
+		for(Justification justification: implication.result.justifications.values()){
+			if (justification.implication == implication)
+				toRemove.add(justification);
+		}
+		for(Justification justification: toRemove){
+			implication.result.justifications.remove(justification.toString());
+		}
+		if(implication.result.justifications.size()==0)
+			implication.result.in_effect = false;
+	}
+	
+	public void retractVariable(Variable variable){
+		System.out.println("Retracting "+variable);
+		variable.in_effect = false;
+		for(Variable sentence: variables.values()){
+			ArrayList<Justification> toRemove = new ArrayList<Justification>();
+			for(Justification justification: sentence.justifications.values()){
+				if(justification.required_variables.contains(variable))
+					toRemove.add(justification);
+			}
+			for(Justification justification: toRemove){
+				sentence.justifications.remove(justification.toString());
+				if(sentence.justifications.size()==0){
+					retractVariable(sentence);
+					
+				}
+			}
+		}
+		for(Implication implication: implications.values()){
+			ArrayList<Justification> toRemove = new ArrayList<Justification>();
+			for(Justification justification: implication.justifications.values()){
+				if(justification.required_variables.contains(variable))
+					toRemove.add(justification);
+			}
+			for(Justification justification: toRemove){
+				implication.justifications.remove(justification.toString());
+				if(implication.justifications.size()==0){
+					retractImplication(implication);
+				}
+			}
+		}
+	}
 	
 	public String getState(){
 		StringBuilder sb = new StringBuilder();

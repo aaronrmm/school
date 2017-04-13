@@ -12,7 +12,7 @@ public class Variable extends Sentence{
 		sb.append(name);
 		if(this.justifications.size()>0){
 			sb.append(":");
-			for(Justification justification: this.justifications){
+			for(Justification justification: this.justifications.values()){
 				sb.append(justification.toString());
 			}
 		}

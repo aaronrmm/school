@@ -5,12 +5,16 @@ public class Test {
 		TMS tms = new TMS();
 		
 		
-		tms.addSentence("A+B->Q");
+		tms.addSentence("C*A+B->Q");
 		System.out.println(tms.getState());
 
 		tms.addSentence("A");
 		tms.addSentence("B");
+		tms.addSentence("C");
 		
+		System.out.println(tms.getState());
+		
+		tms.retract_sentence("A");
 		System.out.println(tms.getState());
 		
 	}
