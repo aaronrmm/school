@@ -2,6 +2,7 @@ import java.util.HashMap;
 
 public abstract class Sentence {
 	public boolean in_effect = false;
+	public boolean ground_truth = false;
 	public HashMap<String, Justification> justifications = new HashMap<String, Justification>();
 	
 	public boolean foundTrue(){

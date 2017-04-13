@@ -53,12 +53,14 @@ public class TMS {
 	public void retract_sentence(String string){
 		Variable variable = variables.get(string);
 		if(variable!=null){
+			variable.ground_truth = false;
 			retractVariable(variable);
 			return;
 		}
 		else{
 			Implication implication = implications.get(string);
 			if(implication!=null){
+				implication.ground_truth = false;
 				retractImplication(implication);
 				return;
 			}
@@ -93,7 +95,7 @@ public class TMS {
 			}
 			for(Justification justification: toRemove){
 				sentence.justifications.remove(justification.toString());
-				if(sentence.justifications.size()==0){
+				if(sentence.ground_truth==false && sentence.justifications.size()==0){
 					retractVariable(sentence);
 					
 				}
@@ -107,7 +109,7 @@ public class TMS {
 			}
 			for(Justification justification: toRemove){
 				implication.justifications.remove(justification.toString());
-				if(implication.justifications.size()==0){
+				if(implication.ground_truth==false && implication.justifications.size()==0){
 					retractImplication(implication);
 				}
 			}
@@ -133,6 +135,7 @@ public class TMS {
 		if (split.length==1){//variable
 			Variable variable = getVariable(split[0]);
 			in_effect(variable);
+			variable.ground_truth = true;
 			retract_conflicts(variable);
 			for(Implication implication: implications.values())
 				if(implication.in_effect)
@@ -157,6 +160,7 @@ public class TMS {
 			
 			Implication implication = new Implication(result, requirements);
 			in_effect(implication);
+			implication.ground_truth = true;
 			implications.put(string, implication);
 			DebugPrint.print_debug("adding "+implication);
 			tryImplication(implication);

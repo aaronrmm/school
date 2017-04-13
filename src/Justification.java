@@ -13,9 +13,10 @@ public class Justification {
 	public String toString(){
 		StringBuilder sb = new StringBuilder();
 		sb.append("{");
-		for(Variable v: required_variables){
-			sb.append(v.name);
+		for(int i=0;i<required_variables.size()-1;i++){
+			sb.append(required_variables.get(i).name+",");
 		}
+		sb.append(required_variables.get(required_variables.size()-1).name);
 		sb.append(",");
 		sb.append(implication.toString());
 		sb.append("}");
