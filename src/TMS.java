@@ -2,7 +2,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class TMS {
-	
+	ArrayList<Sentence> sentences = new ArrayList<Sentence>();
 	HashMap<String,Variable> variables = new HashMap<String,Variable>();
 	HashMap<String, Implication> implications = new HashMap<String, Implication>();
 	
@@ -11,6 +11,8 @@ public class TMS {
 		if (got == null){
 			got = new Variable(name);
 			variables.put(name, got);
+			DebugPrint.print_debug("adding "+got);
+			sentences.add(got);
 		}
 		return got;
 	}
@@ -35,7 +37,7 @@ public class TMS {
 			}
 		}
 		if (implication_fulfilled){
-			implication.result.in_effect = true;
+			in_effect(implication.result);
 			ArrayList<ArrayList<Object>> justifiaction_bags = new RecursivePacker().pack(permutations);
 			for (ArrayList<Object> bag : justifiaction_bags){
 				Justification j = new Justification(new ArrayList<Variable>(), implication);
@@ -62,11 +64,11 @@ public class TMS {
 			}
 			
 		}
-		System.out.println("Sentence does not exist in knowledge base.");
+		DebugPrint.print_debug("Sentence \""+string+"\" does not exist in knowledge base.");
 	}
 	
 	public void retractImplication(Implication implication){
-		System.out.println("Retracting "+implication);
+		DebugPrint.print_debug("Retracting "+implication);
 		implication.in_effect = false;
 		ArrayList<Justification> toRemove = new ArrayList<Justification>();
 		for(Justification justification: implication.result.justifications.values()){
@@ -81,7 +83,7 @@ public class TMS {
 	}
 	
 	public void retractVariable(Variable variable){
-		System.out.println("Retracting "+variable);
+		DebugPrint.print_debug("Retracting "+variable);
 		variable.in_effect = false;
 		for(Variable sentence: variables.values()){
 			ArrayList<Justification> toRemove = new ArrayList<Justification>();
@@ -117,13 +119,7 @@ public class TMS {
 		sb.append("\n");
 		sb.append("*****************");
 		sb.append("\n");
-		for(Sentence sentence: variables.values()){
-			if (sentence.in_effect){
-				sb.append("\n");
-				sb.append(sentence);
-			}
-		}
-		for(Sentence sentence: implications.values()){
+		for(Sentence sentence: sentences){
 			if (sentence.in_effect){
 				sb.append("\n");
 				sb.append(sentence);
@@ -136,9 +132,10 @@ public class TMS {
 		String[] split = string.split("->");
 		if (split.length==1){//variable
 			Variable variable = getVariable(split[0]);
-			variable.in_effect = true;
+			in_effect(variable);
 			for(Implication implication: implications.values())
-				tryImplication(implication);
+				if(implication.in_effect)
+					tryImplication(implication);
 			
 		}
 		else if (split.length==2){//implication
@@ -158,9 +155,23 @@ public class TMS {
 			Variable result = getVariable(split[1]);
 			
 			Implication implication = new Implication(result, requirements);
-			implication.in_effect = true;
+			in_effect(implication);
 			implications.put(string, implication);
+			DebugPrint.print_debug("adding "+implication);
 			tryImplication(implication);
 		}
+	}
+	
+	void in_effect(Sentence sentence){
+		if(sentences.contains(sentence)){
+			if (sentence.in_effect==false){
+				if(sentences.remove(sentence))
+					sentences.add(sentence);
+			}
+		}else {
+			sentences.add(sentence);
+			DebugPrint.print_debug("new addition:" +sentence);
+		}
+		sentence.in_effect = true;
 	}
 }

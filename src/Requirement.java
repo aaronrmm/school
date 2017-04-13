@@ -11,7 +11,7 @@ public class Requirement {
 		for(int i=0; i<disjuncts.length-1;i++){
 			sb.append(disjuncts[i].name+"+");
 		}
-		sb.append(disjuncts[disjuncts.length-1]);
+		sb.append(disjuncts[disjuncts.length-1].name);
 		return sb.toString();
 	}
 }
