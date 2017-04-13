@@ -125,6 +125,12 @@ public class TMS {
 			if (sentence.in_effect){
 				sb.append("\n");
 				sb.append(sentence);
+				if (sentence instanceof Variable){
+					Variable negative = variables.get(getNegative((Variable)sentence));
+					if (negative!=null && negative.in_effect){
+						sb.append("*CONFLICT WITH "+negative.name+"*");
+					}
+				}
 			}
 		}
 		return sb.toString();
@@ -180,14 +186,17 @@ public class TMS {
 		sentence.in_effect = true;
 	}
 	
-	void retract_conflicts(Variable variable){
-		String negative = "";
+	String getNegative(Variable variable){
 		if(variable.name.startsWith("-")){
-			negative = variable.name.substring(1);
+			return variable.name.substring(1);
 		}
 		else{
-			negative = "-"+variable.name;
+			return "-"+variable.name;
 		}
+	}
+	
+	void retract_conflicts(Variable variable){
+		String negative = getNegative(variable);
 		if(variables.containsKey(negative))
 		retractVariable(variables.get(negative));
 		
