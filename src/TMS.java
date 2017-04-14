@@ -118,12 +118,8 @@ public class TMS {
 	
 	public String getState(){
 		StringBuilder sb = new StringBuilder();
-		sb.append("\n");
-		sb.append("*****************");
-		sb.append("\n");
 		for(Sentence sentence: sentences){
 			if (sentence.in_effect){
-				sb.append("\n");
 				sb.append(sentence);
 				if (sentence instanceof Variable){
 					Variable negative = variables.get(getNegative((Variable)sentence));
@@ -131,6 +127,7 @@ public class TMS {
 						sb.append("*CONFLICT WITH "+negative.name+"*");
 					}
 				}
+				sb.append("\n");
 			}
 		}
 		return sb.toString();
