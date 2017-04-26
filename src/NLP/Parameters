@@ -1,0 +1,5 @@
+Parameters
+	n of ngrams, e.g. unigram, bigram, trigram, etc.
+	number of ngrams to store - Weka's StringToWordVector already supports a max number of ngrams and only stores the most frequent ngrams.
+	stop words
+	word-generalizing

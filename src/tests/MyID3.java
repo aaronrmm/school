@@ -1,4 +1,4 @@
-package NLP;
+package tests;
 
 import weka.classifiers.trees.Id3;
 import weka.core.DenseInstance;
