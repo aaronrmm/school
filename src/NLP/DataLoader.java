@@ -13,10 +13,27 @@ import java.util.ArrayList;
 //this class loads the files from NLPdata, reads each sentence and randomly puts it into one of two lists with .3 and .7 probability
 public class DataLoader {
 
-	static final int MAX_LINES = 6000;
-	static ArrayList<String> training = new ArrayList<String>();
-	static ArrayList<String> testing = new ArrayList<String>();
-	public static void Load(){
+	int max_lines = 6000;
+	double testing_perportion = 0.3;
+	
+	ArrayList<String> training = null;
+	ArrayList<String> testing = null;
+	
+	public DataLoader(int max_lines, double testing_perportion) {
+		this.max_lines = max_lines;
+		this.testing_perportion = testing_perportion;
+	}
+	
+	public ArrayList<String> getTrainingData(){
+		if (training==null) load();
+		return training;
+	}
+	public ArrayList<String> getTestingData(){
+		if (testing==null) load();
+		return testing;
+	}
+	
+	public void load(){
 		FileReader fReader = null;
 		BufferedReader bReader = null;
 		try {
@@ -28,12 +45,14 @@ public class DataLoader {
 			        System.out.println(file.getFileName());
 			        fReader = new FileReader(file.toString());
 			        bReader = new BufferedReader(fReader);
-			        while(lines<MAX_LINES/3){
+			        training = new ArrayList<String>();
+			        testing = new ArrayList<String>();
+			        while(lines<max_lines/3){
 			        	String line = bReader.readLine();
 			        	lines++;
 			        	if(line==null)
 			        		break;
-			        	if(Math.random()>.3)
+			        	if(Math.random()>testing_perportion)
 			        		training.add(line);
 			        	else
 			        		testing.add(line);

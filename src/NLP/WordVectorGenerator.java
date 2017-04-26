@@ -12,7 +12,6 @@ import weka.filters.unsupervised.attribute.NumericToBinary;
 import weka.filters.unsupervised.attribute.StringToWordVector;
 
 public class WordVectorGenerator {
-	private Instances binary_format;
 	StringToWordVector wv;
 	NumericToBinary n2b;
 	int n_of_ngrams;
@@ -55,10 +54,11 @@ public class WordVectorGenerator {
 			System.out.println("Genenerated word vectors of size "+(output.numAttributes()-1));
 			//while(wv.batchFinished())
 			//output.add(wv.output());
-			n2b = new NumericToBinary();
-			n2b.setInputFormat(output);
-			output = Filter.useFilter(output, n2b);
-			output.setClassIndex(0);
+			//n2b = new NumericToBinary();
+			//n2b.setInputFormat(output);
+			//output = Filter.useFilter(output, n2b);
+			//output.setClassIndex(0);
+			
 			
 			ArrayList<Attribute> list = new ArrayList<Attribute>();
 			ArrayList<String> binary_values = new ArrayList<String>();
@@ -69,9 +69,12 @@ public class WordVectorGenerator {
 				else
 					list.add(output.attribute(i));
 			}
-			binary_format = new Instances("wordvectors", list, 10000);
+			Instances binary_format = new Instances("wordvectors", list, 10000);
+			for(Instance instance: output)
+				binary_format.add(instance);
 			
-			return output;
+			
+			return binary_format;
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

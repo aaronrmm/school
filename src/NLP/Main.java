@@ -37,14 +37,31 @@ public class Main {
 			}
 		
 		//Load data
-		DataLoader.Load();
-		ArrayList<String> training_data = DataLoader.training;
-		ArrayList<String> test_data = DataLoader.testing;
+		DataLoader dataLoader = new DataLoader(Integer.MAX_VALUE, 0.3);
+		DataLoader testdataLoader = new DataLoader(0, 0){
+			@Override
+			public ArrayList<String>getTrainingData(){
+				ArrayList<String>list = new ArrayList<String>();
+				list.add("Uwha!tU mate?\t0");
+				list.add("UewrhatU mate?\t0");
+				list.add("UewrhaggewratUmate?\t1");
+				return list;
+			}
+			@Override
+			public ArrayList<String>getTestingData(){
+				ArrayList<String>list = new ArrayList<String>();
+				list.add("UwhatUmate?\t0");
+				return list;
+				
+			}
+		};
+		ArrayList<String> training_data = dataLoader.getTrainingData();
+		ArrayList<String> test_data = dataLoader.getTestingData();
 		
 
 		//Clean data
-		clean_sentences(training_data);
-		clean_sentences(test_data);
+		training_data = clean_sentences(training_data);
+		test_data = clean_sentences(test_data);
 		
 
 		//convert to weka instances
@@ -80,12 +97,12 @@ public class Main {
 						true_negatives++;
 				}
 				else{
+					System.out.println("incorrect"+SentenceToWekaInstance.getClassValue(test)+"!="+classification+":"+test);
 					if(classification==1)
 						false_positives++;
 					else
 						false_negatives++;
 				}
-					System.out.println("incorrect"+SentenceToWekaInstance.getClassValue(test)+"!="+classification+":"+test);
 			}
 			System.out.println("true positives: "+true_positives/total);
 			System.out.println("false positives: "+false_positives/total);

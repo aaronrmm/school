@@ -5,7 +5,7 @@ import java.util.ArrayList;
 public class SentenceCleaner {
 	
 	static String[] postfixes_to_trim = new String[]{"ing","es","s","er","ers","ed","\\'s","s\\'"};
-	static String[] punctuation_to_trim = new String[]{"\\.","\\,","\\:","\\;","\\!","\\(","\\)"};
+	static String[] punctuation_to_trim = new String[]{"\\.","\\,","\\:","\\;","\\!","\\(","\\)","\\?"};
 	
 	public static String stripPostfixes(String sentence){
 		StringBuilder builder = new StringBuilder();
