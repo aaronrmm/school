@@ -6,5 +6,11 @@
 			<attribute name="owner.project.facets" value="java"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="lib" path="weka.jar" sourcepath="C:/Program Files/Weka-3-8/weka-src.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="http://weka.sourceforge.net/doc.stable/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="simpleEducationalLearningSchemes.jar" sourcepath="simpleEducationalLearningSchemes.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>
