@@ -38,30 +38,13 @@ public class Main {
 		
 		//Load data
 		DataLoader dataLoader = new DataLoader(Integer.MAX_VALUE, 0.3);
-		DataLoader testdataLoader = new DataLoader(0, 0){
-			@Override
-			public ArrayList<String>getTrainingData(){
-				ArrayList<String>list = new ArrayList<String>();
-				list.add("Uwha!tU mate?\t0");
-				list.add("UewrhatU mate?\t0");
-				list.add("UewrhaggewratUmate?\t1");
-				return list;
-			}
-			@Override
-			public ArrayList<String>getTestingData(){
-				ArrayList<String>list = new ArrayList<String>();
-				list.add("UwhatUmate?\t0");
-				return list;
-				
-			}
-		};
 		ArrayList<String> training_data = dataLoader.getTrainingData();
 		ArrayList<String> test_data = dataLoader.getTestingData();
 		
 
 		//Clean data
-		training_data = clean_sentences(training_data);
-		test_data = clean_sentences(test_data);
+		training_data = SentenceCleaner.cleanSentences(training_data,FLATTEN_UPPERCASE, STRIP_PUNCTUATION, STRIP_STOPWORDS, STRIP_SUFFIXES );
+		test_data = SentenceCleaner.cleanSentences(test_data ,FLATTEN_UPPERCASE, STRIP_PUNCTUATION, STRIP_STOPWORDS, STRIP_SUFFIXES );
 		
 
 		//convert to weka instances
@@ -125,17 +108,4 @@ public class Main {
 		
 		
 	}
-	
-	private static ArrayList<String> clean_sentences(ArrayList<String> sentences){
-		//clean data
-		if(FLATTEN_UPPERCASE)
-			sentences = SentenceCleaner.flatten_uppercase(sentences);
-		if(STRIP_PUNCTUATION)
-			sentences = SentenceCleaner.strip_punctuation(sentences);
-		if(STRIP_SUFFIXES)
-			sentences = SentenceCleaner.stripPostfixes(sentences);
-		return sentences;
-	}
-	
-	
 }

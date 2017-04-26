@@ -4,9 +4,33 @@ import java.util.ArrayList;
 
 public class SentenceCleaner {
 	
-	static String[] postfixes_to_trim = new String[]{"ing","es","s","er","ers","ed","\\'s","s\\'"};
-	static String[] punctuation_to_trim = new String[]{"\\.","\\,","\\:","\\;","\\!","\\(","\\)","\\?"};
+	static final String[] postfixes_to_trim = new String[]{"ing","es","s","er","ers","ed","\\'s","s\\'"};
+	static final String[] punctuation_to_trim = new String[]{"\\.","\\,","\\:","\\;","\\!","\\(","\\)","\\?"};
+	static final String[] stopwords = new String[]{"i","is","the","this","then","than","if","me","you","in","to"};
 	
+	public static ArrayList<String> cleanSentences(ArrayList<String> sentences, boolean flatten, boolean strip_punctuation, boolean strip_stopwords, boolean strip_postfixes){
+		ArrayList<String> cleaned_sentences = new ArrayList<String>();
+		for(String sentence : sentences){
+			cleaned_sentences.add(cleanSentence(sentence, flatten, strip_punctuation, strip_stopwords, strip_postfixes));
+		}
+		return cleaned_sentences;
+	}
+	
+	
+	private static String cleanSentence(String sentence, boolean flatten, boolean strip_punctuation,
+			boolean strip_stopwords, boolean strip_postfixes) {
+		if(flatten)
+			sentence = sentence.toLowerCase();
+		if(strip_punctuation)
+			sentence = strip_punctuation(sentence);
+		if(strip_stopwords)
+			sentence = strip_stopwords(sentence);
+		if(strip_postfixes)
+			sentence = stripPostfixes(sentence);
+		return sentence;
+	}
+
+
 	public static String stripPostfixes(String sentence){
 		StringBuilder builder = new StringBuilder();
 		String[] words = sentence.split(" ");
@@ -24,31 +48,28 @@ public class SentenceCleaner {
 		return builder.toString();
 	}
 	
-	public static ArrayList<String> stripPostfixes(ArrayList<String> sentences){
-		ArrayList<String> stripped_strings = new ArrayList<String>();
-		for(String sentence : sentences)
-			stripped_strings.add(stripPostfixes(sentence));
-		return stripped_strings;
-	}
-	
 	public static String strip_punctuation(String sentence){
 		for (int i = 0; i< punctuation_to_trim.length; i++){
 			sentence = sentence.replaceAll(punctuation_to_trim[i], " ");
 		}
 		return sentence;
 	}
-	
-	public static ArrayList<String> strip_punctuation(ArrayList<String> sentences){
-		ArrayList<String> stripped_strings = new ArrayList<String>();
-		for(String sentence : sentences)
-			stripped_strings.add(strip_punctuation(sentence));
-		return stripped_strings;
-	}
 
-	public static ArrayList<String> flatten_uppercase(ArrayList<String> sentences) {
-		ArrayList<String>flattened_strings = new ArrayList<String>();
-		for(String string: sentences)
-			flattened_strings.add(string.toLowerCase());
-		return flattened_strings;
+	public static String strip_stopwords(String sentence){
+		StringBuilder builder = new StringBuilder();
+		String[] split = sentence.split(" ");
+		for(int i=0;i<split.length;i++){
+			boolean acceptable = true;
+			for(int sw=0; sw<stopwords.length; sw++){
+				if(split.equals(stopwords[sw])){
+					acceptable = false;
+					break;
+				}
+			}
+			if (acceptable)
+				builder.append(split[i]+" ");
+		}
+		return builder.toString();
+		
 	}
 }
