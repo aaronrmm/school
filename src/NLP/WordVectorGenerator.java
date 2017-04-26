@@ -1,5 +1,8 @@
 package NLP;
 
+import java.util.ArrayList;
+
+import weka.core.Attribute;
 import weka.core.DenseInstance;
 import weka.core.Instance;
 import weka.core.Instances;
@@ -9,6 +12,7 @@ import weka.filters.unsupervised.attribute.NumericToBinary;
 import weka.filters.unsupervised.attribute.StringToWordVector;
 
 public class WordVectorGenerator {
+	private Instances binary_format;
 	StringToWordVector wv;
 	NumericToBinary n2b;
 	int n_of_ngrams;
@@ -48,12 +52,24 @@ public class WordVectorGenerator {
 		Instances output=null;
 		try {
 			output = Filter.useFilter(sentences, wv);
+			System.out.println("Genenerated word vectors of size "+(output.numAttributes()-1));
 			//while(wv.batchFinished())
 			//output.add(wv.output());
 			n2b = new NumericToBinary();
 			n2b.setInputFormat(output);
 			output = Filter.useFilter(output, n2b);
 			output.setClassIndex(0);
+			
+			ArrayList<Attribute> list = new ArrayList<Attribute>();
+			ArrayList<String> binary_values = new ArrayList<String>();
+			binary_values.add("0"); binary_values.add("1");
+			for(int i=0;i<output.numAttributes();i++){
+				if(output.attribute(i).isNumeric())
+					list.add(new Attribute(output.attribute(i).name(), binary_values));
+				else
+					list.add(output.attribute(i));
+			}
+			binary_format = new Instances("wordvectors", list, 10000);
 			
 			return output;
 		} catch (Exception e) {

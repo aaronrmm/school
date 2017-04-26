@@ -5,48 +5,59 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 
 import weka.classifiers.trees.Id3;
-import weka.core.Attribute;
-import weka.core.DenseInstance;
 import weka.core.Instance;
 import weka.core.Instances;
 
 public class Main {
 	
-	static WordVectorGenerator wvg = new WordVectorGenerator(1,100000);
-	static Attribute content_attr = new Attribute("content",(ArrayList<String>)null);
-	static Attribute class_attr;
-    static ArrayList<String> classVal = new ArrayList<String>();
+	final static int N_OF_NGRAMS = 1;
+	final static int MAX_NGRAM_COUNT = 1000000;
+	final static boolean FLATTEN_UPPERCASE = true;
+	final static boolean STRIP_SUFFIXES = true;
+	final static boolean STRIP_PUNCTUATION = true;
+	final static boolean STRIP_STOPWORDS = true;
+	final static String CONSOLE_OUTPUT_FILENAME = null;
+	
+	//Parameters
+	static WordVectorGenerator wvg = new WordVectorGenerator(N_OF_NGRAMS, MAX_NGRAM_COUNT);
+	
+	
+	
+	
+
+    
+    
 	public static void main(String[]args){
-		try {
-			System.setOut(new PrintStream("output"));
-		} catch (FileNotFoundException e1) {
-			e1.printStackTrace();
-		}
+		//Set output to file "output"
+		if(CONSOLE_OUTPUT_FILENAME!=null)
+			try {
+				System.setOut(new PrintStream(CONSOLE_OUTPUT_FILENAME));
+			} catch (FileNotFoundException e1) {
+				e1.printStackTrace();
+			}
+		
+		//Load data
 		DataLoader.Load();
 		ArrayList<String> training_data = DataLoader.training;
+		ArrayList<String> test_data = DataLoader.testing;
 		
-		//read each sentence and tokenize
-		
-		ArrayList<Attribute> atts = new ArrayList<Attribute>(2);
-        classVal.add("negative");
-        classVal.add("positive");
-        atts.add(content_attr);
-        class_attr = new Attribute("classVal",classVal);
-        atts.add(class_attr);
-		
-        Instances training_set = new Instances("TestInstances",atts,0);
 
-        ArrayList<String> training_strings = new ArrayList<String>();
-        for(int i=0;i <training_data.size() && i<30000;i++){
-        	String sentence = training_data.get(i);
-        	training_set.add(sentenceToInstance(sentence));
-        	training_strings.add(sentence);
-        }
+		//Clean data
+		clean_sentences(training_data);
+		clean_sentences(test_data);
+		
 
+		//convert to weka instances
+		Instances training_instances = SentenceToWekaInstance.sentencesToInstances(training_data);
+
+
+		//convert instances to word vectors and produce ngram list
 		System.out.println("CREATING WORD VECTOR FROM TRAINING DATA");
-		Instances output= wvg.getWordVectors(training_set);
+		Instances output= wvg.getWordVectors(training_instances);
 		output.setClassIndex(0);
 		
+		
+		//run ID3 on word vectors
 		try {
 			System.out.println("CREATING ID3");
 			Id3 id3 = new Id3();
@@ -58,11 +69,11 @@ public class Main {
 			double false_negatives=0;
 			double true_positives=0;
 			double true_negatives=0;
-			for(String test: DataLoader.testing){
+			for(String test: test_data){
 				total++;
 				Instance wordVector = wvg.getWordVector(test);
 				double classification = id3.classifyInstance(wordVector);
-				if(getClassValue(test) == classification){
+				if(SentenceToWekaInstance.getClassValue(test) == classification){
 					if(classification==1)
 						true_positives++;
 					else
@@ -74,7 +85,7 @@ public class Main {
 					else
 						false_negatives++;
 				}
-					System.out.println("incorrect"+getClassValue(test)+"!="+classification+":"+test);
+					System.out.println("incorrect"+SentenceToWekaInstance.getClassValue(test)+"!="+classification+":"+test);
 			}
 			System.out.println("true positives: "+true_positives/total);
 			System.out.println("false positives: "+false_positives/total);
@@ -85,7 +96,6 @@ public class Main {
 			Instance vector = wvg.getWordVector(insert);
 			System.out.println(id3.classifyInstance(vector));
 			System.out.println(id3.classifyInstance(wvg.getWordVector("awful terrible bad wait line gross vomit in caterpiller in\t0")));
-			System.out.println(vector);
 			
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -99,19 +109,16 @@ public class Main {
 		
 	}
 	
-	static Instance sentenceToInstance(String sentence){
-    	String[]split = sentence.split("\t");
-        double[] instanceValue1 = new double[2];
-        instanceValue1[0] = content_attr.addStringValue(split[0]);
-        instanceValue1[1] = getClassValue(sentence);
-        Instance instance = new DenseInstance(1.0, instanceValue1);
-        return instance;
+	private static ArrayList<String> clean_sentences(ArrayList<String> sentences){
+		//clean data
+		if(FLATTEN_UPPERCASE)
+			sentences = SentenceCleaner.flatten_uppercase(sentences);
+		if(STRIP_PUNCTUATION)
+			sentences = SentenceCleaner.strip_punctuation(sentences);
+		if(STRIP_SUFFIXES)
+			sentences = SentenceCleaner.stripPostfixes(sentences);
+		return sentences;
 	}
 	
-	static int getClassValue(String sentence){
-    	String[]split = sentence.split("\t");
-        return Integer.parseInt(split[1]);
-		
-	}
 	
 }
