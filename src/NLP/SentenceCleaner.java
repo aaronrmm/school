@@ -4,9 +4,10 @@ import java.util.ArrayList;
 
 public class SentenceCleaner {
 	
-	static final String[] postfixes_to_trim = new String[]{"ing","es","s","er","ers","ed","\\'s","s\\'"};
+	static final String[] postfixes_to_trim = new String[]{"ing","es","s","er","ers","ed","\\'s","s\\'","\\'ve","\\'nt","ly","y"};
 	static final String[] punctuation_to_trim = new String[]{"\\.","\\,","\\:","\\;","\\!","\\(","\\)","\\?"};
-	static final String[] stopwords = new String[]{"i","is","the","this","then","than","if","me","you","in","to"};
+	static final String[] stopwords = new String[]{"i","is","the","this","then","than","if","me","you","in","to","and",
+			"my","we","at","be","do","from","had","of","a","as","an","i\\'ve","for","out","was","were","so","i'm"};
 	
 	public static ArrayList<String> cleanSentences(ArrayList<String> sentences, boolean flatten, boolean strip_punctuation, boolean strip_stopwords, boolean strip_postfixes){
 		ArrayList<String> cleaned_sentences = new ArrayList<String>();
@@ -61,7 +62,7 @@ public class SentenceCleaner {
 		for(int i=0;i<split.length;i++){
 			boolean acceptable = true;
 			for(int sw=0; sw<stopwords.length; sw++){
-				if(split.equals(stopwords[sw])){
+				if(split[i].equals(stopwords[sw])){
 					acceptable = false;
 					break;
 				}

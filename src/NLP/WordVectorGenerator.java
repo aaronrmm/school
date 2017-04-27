@@ -103,4 +103,8 @@ public class WordVectorGenerator {
 		}
 		return format.firstInstance();
 	}
+	
+	public String getStats(){
+		return (wv.getOutputFormat().numAttributes()-1)+" ngrams generated";
+	}
 }

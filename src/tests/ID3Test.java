@@ -6,7 +6,7 @@ import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.converters.ConverterUtils.DataSource;
 
-public class MyID3 {
+public class ID3Test {
 	
 	public static void main(String[]args){
 		Id3 id3 = new Id3();
